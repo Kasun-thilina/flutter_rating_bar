@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:icon_decoration/icon_decoration.dart';
 
 void main() => runApp(MyApp());
 
@@ -244,33 +245,42 @@ class _MyAppState extends State<MyApp> {
           initialRating: _initialRating,
           direction: _isVertical ? Axis.vertical : Axis.horizontal,
           itemCount: 5,
+          glow: false,
+          // unratedColor: Colors.grey,
+          unratedColorBlendMode: BlendMode.colorDodge,
           itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
           itemBuilder: (context, index) {
             switch (index) {
               case 0:
                 return Icon(
                   Icons.sentiment_very_dissatisfied,
-                  color: Colors.red,
+                  color:  _rating>=0? Colors.lightGreen:Colors.white,
                 );
               case 1:
                 return Icon(
                   Icons.sentiment_dissatisfied,
-                  color: Colors.redAccent,
+                  color:  _rating>=1? Colors.lightGreen:Colors.white,
                 );
               case 2:
                 return Icon(
                   Icons.sentiment_neutral,
-                  color: Colors.amber,
+                  color:  _rating>=2? Colors.lightGreen:Colors.white,
                 );
               case 3:
                 return Icon(
                   Icons.sentiment_satisfied,
-                  color: Colors.lightGreen,
+                  color: _rating>=3? Colors.lightGreen:Colors.white,
                 );
               case 4:
-                return Icon(
-                  Icons.sentiment_very_satisfied,
-                  color: Colors.green,
+                return DecoratedIcon(
+                  icon: Icon(
+                    Icons.star_rate_rounded,
+                    size: 40,
+                    color:  _rating>=4? Colors.lightGreen:Colors.white,
+                  ),
+                  decoration: IconDecoration(
+                    border: IconBorder(color: Colors.grey)
+                  ),
                 );
               default:
                 return Container();

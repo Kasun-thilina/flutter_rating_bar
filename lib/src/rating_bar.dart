@@ -42,6 +42,7 @@ class RatingBar extends StatefulWidget {
     this.maxRating,
     this.textDirection,
     this.unratedColor,
+    this.unratedColorBlendMode,
     this.allowHalfRating = false,
     this.direction = Axis.horizontal,
     this.glow = true,
@@ -70,6 +71,7 @@ class RatingBar extends StatefulWidget {
     this.maxRating,
     this.textDirection,
     this.unratedColor,
+    this.unratedColorBlendMode,
     this.allowHalfRating = false,
     this.direction = Axis.horizontal,
     this.glow = true,
@@ -114,6 +116,10 @@ class RatingBar extends StatefulWidget {
   /// Default is [ThemeData.disabledColor].
   /// {@endtemplate}
   final Color? unratedColor;
+
+
+  /// BlendMode for the [unratedColor] value
+  final BlendMode? unratedColorBlendMode;
 
   /// Default [allowHalfRating] = false.
   /// Setting true enables half rating support.
@@ -188,6 +194,7 @@ class RatingBar extends StatefulWidget {
   /// Defaults to [WrapAlignment.start].
   final WrapAlignment wrapAlignment;
 
+
   final IndexedWidgetBuilder? _itemBuilder;
   final RatingWidget? _ratingWidget;
 
@@ -259,17 +266,19 @@ class _RatingBarState extends State<RatingBar> {
     if (index >= _rating) {
       resolvedRatingWidget = _NoRatingWidget(
         size: widget.itemSize,
+        unratedColorBlendMode: widget.unratedColorBlendMode,
         enableMask: ratingWidget == null,
-        unratedColor: widget.unratedColor ?? Theme.of(context).disabledColor,
+        unratedColor: widget.unratedColor ?? Colors.transparent,
         child: ratingWidget?.empty ?? item!,
       );
     } else if (index >= _rating - ratingOffset && widget.allowHalfRating) {
       if (ratingWidget?.half == null) {
         resolvedRatingWidget = _HalfRatingWidget(
           size: widget.itemSize,
+          unratedColorBlendMode: widget.unratedColorBlendMode,
           enableMask: ratingWidget == null,
           rtlMode: _isRTL,
-          unratedColor: widget.unratedColor ?? Theme.of(context).disabledColor,
+          unratedColor: widget.unratedColor ?? Colors.transparent,
           child: item!,
         );
       } else {
@@ -310,8 +319,7 @@ class _RatingBarState extends State<RatingBar> {
           } else {
             final tappedPosition = details.localPosition.dx;
             final tappedOnFirstHalf = tappedPosition <= widget.itemSize / 2;
-            value = index +
-                (tappedOnFirstHalf && widget.allowHalfRating ? 0.5 : 1.0);
+            value = index + (tappedOnFirstHalf && widget.allowHalfRating ? 0.5 : 1.0);
           }
 
           value = math.max(value, widget.minRating);
@@ -331,8 +339,7 @@ class _RatingBarState extends State<RatingBar> {
             valueListenable: _glow,
             builder: (context, glow, child) {
               if (glow && widget.glow) {
-                final glowColor =
-                    widget.glowColor ?? Theme.of(context).colorScheme.secondary;
+                final glowColor = widget.glowColor ?? Theme.of(context).colorScheme.secondary;
                 return DecoratedBox(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
@@ -410,6 +417,7 @@ class _HalfRatingWidget extends StatelessWidget {
     required this.enableMask,
     required this.rtlMode,
     required this.unratedColor,
+    required this.unratedColorBlendMode,
   });
 
   final Widget child;
@@ -417,6 +425,7 @@ class _HalfRatingWidget extends StatelessWidget {
   final bool enableMask;
   final bool rtlMode;
   final Color unratedColor;
+  final BlendMode? unratedColorBlendMode;
 
   @override
   Widget build(BuildContext context) {
@@ -432,6 +441,7 @@ class _HalfRatingWidget extends StatelessWidget {
                     size: size,
                     unratedColor: unratedColor,
                     enableMask: enableMask,
+                    unratedColorBlendMode: unratedColorBlendMode,
                     child: child,
                   ),
                 ),
@@ -482,12 +492,14 @@ class _NoRatingWidget extends StatelessWidget {
     required this.child,
     required this.enableMask,
     required this.unratedColor,
+    required this.unratedColorBlendMode,
   });
 
   final double size;
   final Widget child;
   final bool enableMask;
   final Color unratedColor;
+  final BlendMode? unratedColorBlendMode;
 
   @override
   Widget build(BuildContext context) {
@@ -499,7 +511,7 @@ class _NoRatingWidget extends StatelessWidget {
             ? ColorFiltered(
                 colorFilter: ColorFilter.mode(
                   unratedColor,
-                  BlendMode.srcIn,
+                  unratedColorBlendMode ?? BlendMode.srcIn,
                 ),
                 child: child,
               )
